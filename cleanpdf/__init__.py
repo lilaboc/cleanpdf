@@ -17,7 +17,7 @@ def process(filename):
             path, "PDF", resolution=100.0, save_all=True, append_images=pages[1:]
         )
         for i in [filename, path]:
-            os.system('start "{}"'.format(i))
+            os.system('start "" "{}"'.format(i))
     except Exception as exp:
         print(exp)
         input()
