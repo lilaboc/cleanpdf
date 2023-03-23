@@ -14,7 +14,7 @@ def main():
             path, "PDF", resolution=100.0, save_all=True, append_images=pages[1:]
         )
         for i in [sys.argv[1], path]:
-            os.system('start {}'.format(i))
+            os.system('start "{}"'.format(i))
 
 
 if __name__ == '__main__':
