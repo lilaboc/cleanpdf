@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 pdf2image = "*"
 pillow = "*"
+numpy = "*"
 
 [dev-packages]
 context-menu = "*"
