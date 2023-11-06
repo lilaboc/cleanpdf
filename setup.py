@@ -21,6 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'cleanpdf= cleanpdf:main',
+            'combinepdf= cleanpdf:combine',
+
         ],
     }
 )

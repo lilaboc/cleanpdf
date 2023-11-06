@@ -52,6 +52,20 @@ def process(filename):
         input()
 
 
+def combine():
+    if len(sys.argv) > 2:
+        pages = []
+        for i in sys.argv[1:-1]:
+            pages.extend(convert_from_path(i))
+        pages[0].save(
+            sys.argv[-1], "PDF", resolution=100.0, save_all=True, append_images=pages[1:]
+        )
+
+
+
+
+
+
 def main():
     if len(sys.argv) > 1:
         process(sys.argv[1])
