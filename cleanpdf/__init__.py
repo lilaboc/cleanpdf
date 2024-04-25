@@ -7,6 +7,7 @@ import numpy as np
 from PIL import ImageGrab
 from PIL import Image
 from pdf2image import convert_from_path
+from glob import glob
 
 
 # https://zhuanlan.zhihu.com/p/444684653
@@ -75,7 +76,7 @@ def combine():
     if len(sys.argv) > 2:
         pages = []
         for i in sys.argv[1:-1]:
-            pages.extend(convert_from_path(i))
+            pages.extend(convert_from_path(glob(i)))
         pages[0].save(
             sys.argv[-1], "PDF", resolution=100.0, save_all=True, append_images=pages[1:]
         )
@@ -87,11 +88,14 @@ def combine():
 
 def main():
     if len(sys.argv) > 1:
-        process(sys.argv[1])
+        for i in sys.argv[1:]:
+            for o in glob(i):
+                process(o)
     else:
         im = ImageGrab.grabclipboard()
         if isinstance(im, List) and isinstance(im[0], str) and os.path.exists(im[0]):
-            process(im[0])
+            for i in im:
+                process(i)
 
 
 if __name__ == '__main__':
