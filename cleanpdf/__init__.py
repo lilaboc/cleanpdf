@@ -5,6 +5,7 @@ from typing import List
 
 import numpy as np
 from PIL import ImageGrab
+from PIL import Image
 from pdf2image import convert_from_path
 
 
@@ -31,6 +32,24 @@ def otsu(page):
 
 
 def process(filename):
+    if filename.endswith('.pdf'):
+        process_pdf(filename)
+    else:
+        process_image(filename)
+
+
+def process_image(filename):
+    img = Image.open(filename)
+    img = img.convert("L")
+    threshold = otsu(img)
+    img = img.point(lambda p: 255 if p > threshold else p)
+    path = pathlib.Path(filename)
+    path = path.with_stem(path.stem + "_cleaned")
+    img.save(path, img.format)
+    os.system('start "" "{}"'.format(path))
+
+
+def process_pdf(filename):
     try:
         pages = convert_from_path(filename)
         # pages = [page.convert("L").point(lambda p: 255 if p > 230 else p) for page in pages]
