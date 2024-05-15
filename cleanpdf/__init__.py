@@ -41,8 +41,7 @@ def process(filename):
 
 def process_image(filename):
     img = Image.open(filename)
-    img = img.convert("L")
-    threshold = otsu(img)
+    threshold = otsu(img.convert("L"))
     img = img.point(lambda p: 255 if p > threshold else p)
     path = pathlib.Path(filename)
     path = path.with_stem(path.stem + "_cleaned")
