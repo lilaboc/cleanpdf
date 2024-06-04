@@ -75,7 +75,11 @@ def combine():
     if len(sys.argv) > 2:
         pages = []
         for i in sys.argv[1:-1]:
-            pages.extend(convert_from_path(glob(i)))
+            for filename in glob(i):
+                if filename.endswith('.pdf'):
+                    pages.extend(convert_from_path(filename))
+                else:
+                    pages.extend([Image.open(filename)])
         pages[0].save(
             sys.argv[-1], "PDF", resolution=100.0, save_all=True, append_images=pages[1:]
         )
