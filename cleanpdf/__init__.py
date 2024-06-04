@@ -17,7 +17,6 @@ def otsu(page):
     threshold_t = 0
     max_g = 0
     for t in range(255):
-        print(t)
         front = img[img < t]
         back = img[img >= t]
         front_p = len(front) / (h * w)
