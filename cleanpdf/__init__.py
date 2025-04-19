@@ -1,6 +1,9 @@
+import multiprocessing
 import sys
 import pathlib
 import os
+import time
+from functools import partial
 from typing import List
 
 import numpy as np
@@ -10,8 +13,37 @@ from pdf2image import convert_from_path
 from glob import glob
 
 
-# https://zhuanlan.zhihu.com/p/444684653
+def find_g(img, t):
+    h, w = img.shape[:2]
+    front = img[img < t]
+    back = img[img >= t]
+    front_p = len(front) / (h * w)
+    back_p = len(back) / (h * w)
+    front_mean = np.mean(front) if len(front) > 0 else 0.0
+    back_mean = np.mean(back) if len(back) > 0 else 0.0
+    return front_p * back_p * ((front_mean - back_mean) ** 2)
+
+
+# multiprocess version
 def otsu(page):
+    img = np.array(page)
+    threshold_t = 0
+    max_g = 0
+    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+    max_g = 0
+    for t, g in zip(range(255), pool.map(partial(find_g, img), range(255))):
+        if g > max_g:
+            max_g = g
+            threshold_t = t
+    # print('thredshold is {}'.format(threshold_t))
+    return threshold_t
+
+    # print(zip(*pool.map(partial(find_g, img), range(255))))
+
+
+# https://zhuanlan.zhihu.com/p/444684653
+# single thread version
+def otsu_single(page):
     img = np.array(page)
     h, w = img.shape[:2]
     threshold_t = 0
@@ -27,7 +59,7 @@ def otsu(page):
         if g > max_g:
             max_g = g
             threshold_t = t
-    print('thredshold is {}'.format(threshold_t))
+    # print('thredshold is {}'.format(threshold_t))
     return threshold_t
 
 
@@ -89,6 +121,7 @@ def combine():
 
 
 def main():
+    start = time.time()
     if len(sys.argv) > 1:
         for i in sys.argv[1:]:
             for o in glob(i):
@@ -98,6 +131,7 @@ def main():
         if isinstance(im, List) and isinstance(im[0], str) and os.path.exists(im[0]):
             for i in im:
                 process(i)
+    print(time.time() - start)
 
 
 if __name__ == '__main__':
