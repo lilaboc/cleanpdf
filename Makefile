@@ -1,9 +1,16 @@
 install:
-#	python3 -m pip install --upgrade pip
-#	python3 -m pip install -e .
-	#python3 install_menu.py
-	pipx install --force -e .
-#wheel: requirements.txt
-#	python3 -m build --wheel
-#requirements.txt: Pipfile.lock
-#	pipenv requirements > requirements.txt
+	uv tool install -e .
+
+run:
+	uv tool run cleanpdf
+
+run-combine:
+	uv tool run combinepdf
+
+sync:
+	uv tool install -e .
+
+clean:
+	@-rm -rf .venv
+	@-rm -rf cleanpdf.egg-info
+	uv tool uninstall cleanpdf
