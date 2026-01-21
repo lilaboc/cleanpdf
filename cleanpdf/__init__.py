@@ -24,8 +24,47 @@ def find_g(img, t):
     return front_p * back_p * ((front_mean - back_mean) ** 2)
 
 
-# multiprocess version
+# 优化版本：使用直方图预计算，复杂度从 O(256*H*W) 降到 O(H*W + 256)
 def otsu(page):
+    img = np.array(page)
+    
+    # 计算直方图
+    hist, _ = np.histogram(img.flatten(), bins=256, range=[0, 256])
+    
+    total_pixels = img.size
+    sum_total = np.sum(np.arange(256) * hist)
+    sum_background = 0
+    weight_background = 0
+    
+    max_g = 0
+    threshold_t = 0
+    
+    for t in range(256):
+        weight_background += hist[t]
+        if weight_background == 0:
+            continue
+            
+        weight_foreground = total_pixels - weight_background
+        if weight_foreground == 0:
+            break
+            
+        sum_background += t * hist[t]
+        
+        mean_background = sum_background / weight_background
+        mean_foreground = (sum_total - sum_background) / weight_foreground
+        
+        # 类间方差
+        g = weight_background * weight_foreground * ((mean_background - mean_foreground) ** 2)
+        
+        if g > max_g:
+            max_g = g
+            threshold_t = t
+    
+    return threshold_t
+
+
+# multiprocess version (慢版本，仅作参考)
+def otsu_multiprocess(page):
     img = np.array(page)
     threshold_t = 0
     max_g = 0
@@ -38,11 +77,10 @@ def otsu(page):
     # print('thredshold is {}'.format(threshold_t))
     return threshold_t
 
-    # print(zip(*pool.map(partial(find_g, img), range(255))))
 
 
 # https://zhuanlan.zhihu.com/p/444684653
-# single thread version
+# single thread version (慢版本，仅作参考)
 def otsu_single(page):
     img = np.array(page)
     h, w = img.shape[:2]
